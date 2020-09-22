@@ -1,0 +1,81 @@
+#!/bin/bash
+
+###
+### UiO-styled Letter from Markdown to signed PDF
+###
+### The script requires the LaTeX package uioletter written by Dag Langmyhr
+### A YAML header can be provided to fill fields with non-defaults.
+### Defaults are read from ~/.uioltr-defaults if it exists or placeholders.
+###
+
+### TODO: Defaults-checking and parsing.
+
+### Definitions
+PANDOC=~/.local/bin/pandoc
+TEMPLATE=~/.uioltr-template.tex
+
+### Usage and help
+for i in "$@"
+do
+case $i in
+    -f|--filename)
+      if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+        FILENAME=$2
+       shift 2
+      else
+        echo "Error: Filename for $1 is missing" >&2
+        exit 1
+      fi
+      ;;
+    -h|--help)
+    USAGE=yes
+    shift # past argument=value
+    ;;
+    -t|--template)
+    TEMPLATE=yes
+    shift # past argument=value
+    ;;
+    *)
+          # unknown option
+    ;;
+esac
+done
+
+# echo "FILENAME    = ${FILENAME}"
+# echo "USAGE       = ${USAGE}"
+# echo "TEMPLATE    = ${TEMPLATE}"
+# echo ""
+
+if [[ $USAGE == yes ]];
+then
+    echo "Usage: uioltr -f <filename> [-h] [-t] [-v]"
+    echo 
+    echo "where <filename> is a Markdown document with a YAML header."
+    echo ""
+    echo "  -t | --template shows what YAML tags can be used."
+    echo "  -h | --help prints this message"
+    echo 
+    echo "uioltr v0.1 (c) Torkild H. Lyngstad 2020."
+    echo ""
+fi
+
+if [[ $TEMPLATE == yes ]]; 
+then
+  echo "uioltr understands the following YAML tags:"
+  echo ""
+  echo "author: <your name>"
+  echo "title: <your title>"
+  echo "language: <english or norsk>"
+  echo "date: <date>"
+  echo "signed: <whether or not document is signed>"
+  echo "signature: <path to signature file for signed document>"
+  echo ""
+fi
+
+if [[ -f $FILENAME ]]; 
+then
+    OUTFILE=`echo $FILENAME | cut -f1 -d.`.pdf
+    cat $FILENAME | $PANDOC --template=$TEMPLATE --pdf-engine xelatex -o $OUTFILE
+else
+    echo "Error: File does not exist or no file given."
+fi

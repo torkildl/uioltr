@@ -1,0 +1,12 @@
+# uioltr
+
+This is a small shell script that takes markdown files and converts them into University of Oslo letterhead letters using pandoc.
+
+The script understands a few YAML headers.
+It depends on XeLaTeX package xeuioletter2.
+
+## Installation
+
+1. Copy `uioltr`to ~/.local/bin/ (or elsewhere in PATH)
+2. Copy `uioltr-template to ~/.uioltr-template
+
